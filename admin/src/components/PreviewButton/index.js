@@ -1,9 +1,13 @@
 import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from '@strapi/design-system';
+import { useIntl } from 'react-intl';
 import { Duplicate } from '@strapi/icons';
+import getTrad from '../../utils/getTrad';
 
 const PreviewButton = ({ onClick }) => {
+  const { formatMessage } = useIntl();
+
   return (
     <Button
       onClick={onClick}
@@ -12,7 +16,10 @@ const PreviewButton = ({ onClick }) => {
       variant="secondary"
       style={{ width: '100%' }}
     >
-      Copy to other locales
+      {formatMessage({
+        id: getTrad('sidepanel.button.text'),
+        defaultMessage: 'Copy to other locales',
+      })}
     </Button>
   );
 };

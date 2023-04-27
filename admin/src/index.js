@@ -21,7 +21,6 @@ export default {
       name: pluginId,
       Component: EditViewRightLinks,
     });
-    console.log('Registered?');
   },
   async registerTrads({ locales }) {
     const importedTrads = await Promise.all(
