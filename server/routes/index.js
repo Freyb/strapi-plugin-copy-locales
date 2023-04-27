@@ -4,7 +4,15 @@ module.exports = [
     path: '/generate',
     handler: 'generateController.generate',
     config: {
-      policies: [],
+      policies: ['admin::isAuthenticatedAdmin'],
+    },
+  },
+  {
+    method: 'GET',
+    path: '/config',
+    handler: 'configController.getConfig',
+    config: {
+      policies: ['admin::isAuthenticatedAdmin'],
     },
   },
 ];

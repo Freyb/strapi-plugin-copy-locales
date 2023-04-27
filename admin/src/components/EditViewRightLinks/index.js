@@ -11,19 +11,25 @@ import PreviewButton from '../PreviewButton';
 import CopyModal from '../CopyModal';
 import { pluginId } from '../../pluginId';
 import getTrad from '../../utils/getTrad';
+import useConfig from '../../hooks/useConfig';
 
 const EditViewRightLinks = () => {
   const toggleNotification = useNotification();
   const cmdatamanager = useCMEditViewDataManager();
   const { refetchPermissions } = useRBACProvider();
-  console.log('cmdatamanager');
-  console.log(cmdatamanager);
+  const { config, isLoading: configIsLoading } = useConfig();
+
   const { allLayoutData, isCreatingEntry, initialData, modifiedData } =
     cmdatamanager;
   const { contentType } = allLayoutData;
+  const { uid } = contentType;
+
   const isLocalized = contentType?.pluginOptions?.i18n.localized || false;
+  const allowedEntity =
+    !configIsLoading &&
+    (config.contentTypes === '*' || config.contentTypes.includes(uid));
   const didChangeData = !isEqual(initialData, modifiedData);
-  console.log(didChangeData);
+
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const toggleModal = () => setModalOpen((s) => !s);
@@ -76,7 +82,7 @@ const EditViewRightLinks = () => {
     if (!isLoading) toggleModal();
   };
 
-  if (!isLocalized || isCreatingEntry) return null;
+  if (!isLocalized || !allowedEntity || isCreatingEntry) return null;
 
   return (
     <>
