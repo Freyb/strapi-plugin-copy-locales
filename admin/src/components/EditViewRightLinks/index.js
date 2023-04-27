@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   useNotification,
   useCMEditViewDataManager,
+  useRBACProvider,
 } from '@strapi/helper-plugin';
 import { request } from '@strapi/helper-plugin';
 
@@ -13,6 +14,7 @@ import getTrad from '../../utils/getTrad';
 const EditViewRightLinks = () => {
   const toggleNotification = useNotification();
   const cmdatamanager = useCMEditViewDataManager();
+  const { refetchPermissions } = useRBACProvider();
   console.log('cmdatamanager');
   console.log(cmdatamanager);
   const { allLayoutData, isCreatingEntry, modifiedData } = cmdatamanager;
@@ -28,7 +30,7 @@ const EditViewRightLinks = () => {
       method: 'POST',
       body: { contentType, data: modifiedData },
     })
-      .then(() => {
+      .then(async () => {
         toggleNotification({
           type: 'success',
           message: {
@@ -36,6 +38,9 @@ const EditViewRightLinks = () => {
             defaultMessage: 'Success',
           },
         });
+        setIsLoading(false);
+        toggleModal();
+        await refetchPermissions();
       })
       .catch(() => {
         toggleNotification({
@@ -45,8 +50,6 @@ const EditViewRightLinks = () => {
             defaultMessage: 'Error',
           },
         });
-      })
-      .finally(() => {
         setIsLoading(false);
         toggleModal();
       });
