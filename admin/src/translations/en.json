@@ -1,11 +1,12 @@
 {
-    "genearate.notification.success": "Entities successfully created",
-    "genearate.notification.error": "Something went wrong",
+  "notification.generate.success": "Entities successfully created",
+  "notification.generate.error": "Something went wrong",
+  "notification.generate.modifieddata": "First, save your data!",
 
-    "modal.title": "Create localizations",
-    "modal.body": "Are you sure you want to copy to all other languages?",
-    "modal.button.cancel": "Cancel",
-    "modal.button.confirm": "Confirm",
+  "modal.title": "Create localizations",
+  "modal.body": "Are you sure you want to copy to all other languages?",
+  "modal.button.cancel": "Cancel",
+  "modal.button.confirm": "Confirm",
 
-    "sidepanel.button.text": "Copy to other locales"
+  "sidepanel.button.text": "Copy to other locales"
 }

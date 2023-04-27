@@ -5,6 +5,7 @@ import {
   useRBACProvider,
 } from '@strapi/helper-plugin';
 import { request } from '@strapi/helper-plugin';
+import isEqual from 'lodash/isEqual';
 
 import PreviewButton from '../PreviewButton';
 import CopyModal from '../CopyModal';
@@ -17,13 +18,28 @@ const EditViewRightLinks = () => {
   const { refetchPermissions } = useRBACProvider();
   console.log('cmdatamanager');
   console.log(cmdatamanager);
-  const { allLayoutData, isCreatingEntry, modifiedData } = cmdatamanager;
+  const { allLayoutData, isCreatingEntry, initialData, modifiedData } =
+    cmdatamanager;
   const { contentType } = allLayoutData;
   const isLocalized = contentType?.pluginOptions?.i18n.localized || false;
-
+  const didChangeData = !isEqual(initialData, modifiedData);
+  console.log(didChangeData);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const toggleModal = () => setModalOpen((s) => !s);
+
+  const handleButtonClick = () => {
+    if (!didChangeData) toggleModal();
+    else {
+      toggleNotification({
+        type: 'warning',
+        message: {
+          id: getTrad('notification.generate.modifieddata'),
+          defaultMessage: 'First, save your data!',
+        },
+      });
+    }
+  };
 
   const handleSubmit = () => {
     setIsLoading(true);
@@ -35,7 +51,7 @@ const EditViewRightLinks = () => {
         toggleNotification({
           type: 'success',
           message: {
-            id: getTrad('genearate.notification.success'),
+            id: getTrad('notification.generate.success'),
             defaultMessage: 'Success',
           },
         });
@@ -47,7 +63,7 @@ const EditViewRightLinks = () => {
         toggleNotification({
           type: 'warning',
           message: {
-            id: getTrad('genearate.notification.error'),
+            id: getTrad('notification.generate.error'),
             defaultMessage: 'Error',
           },
         });
@@ -64,7 +80,7 @@ const EditViewRightLinks = () => {
 
   return (
     <>
-      <PreviewButton onClick={toggleModal} />
+      <PreviewButton onClick={handleButtonClick} />
       <CopyModal
         isOpen={isModalOpen}
         onClose={handleCancel}
