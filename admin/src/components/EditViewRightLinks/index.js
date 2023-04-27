@@ -19,6 +19,7 @@ const EditViewRightLinks = () => {
   console.log(cmdatamanager);
   const { allLayoutData, isCreatingEntry, modifiedData } = cmdatamanager;
   const { contentType } = allLayoutData;
+  const isLocalized = contentType?.pluginOptions?.i18n.localized || false;
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -59,7 +60,7 @@ const EditViewRightLinks = () => {
     if (!isLoading) toggleModal();
   };
 
-  if (isCreatingEntry) return null;
+  if (!isLocalized || isCreatingEntry) return null;
 
   return (
     <>
