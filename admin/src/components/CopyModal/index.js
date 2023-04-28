@@ -43,7 +43,6 @@ const CopyModal = ({
   isLoading,
   allLocales,
   existingLocales,
-  currentLocale,
 }) => {
   const { formatMessage } = useIntl();
   const [selected, setSelected] = useState([]);
@@ -95,18 +94,16 @@ const CopyModal = ({
                   options={[
                     {
                       label: 'All',
-                      children: allLocales
-                        .filter((l) => l.code !== currentLocale)
-                        .map((l) => ({
-                          label: existingLocales.includes(l.code) ? (
-                            <Typography variant="omega" fontWeight="bold">
-                              {`* Overwrite ${l.name}`}
-                            </Typography>
-                          ) : (
-                            `+ Create ${l.name}`
-                          ),
-                          value: l.code,
-                        })),
+                      children: allLocales.map((l) => ({
+                        label: existingLocales.includes(l.code) ? (
+                          <Typography variant="omega" fontWeight="bold">
+                            {`* Overwrite ${l.name}`}
+                          </Typography>
+                        ) : (
+                          `+ Create ${l.name}`
+                        ),
+                        value: l.code,
+                      })),
                     },
                   ]}
                 />
@@ -154,7 +151,6 @@ CopyModal.propTypes = {
   onSubmit: PropTypes.func.isRequired,
   allLocales: PropTypes.array,
   existingLocales: PropTypes.array,
-  currentLocale: PropTypes.string,
 };
 
 export default CopyModal;

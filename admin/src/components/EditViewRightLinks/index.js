@@ -14,6 +14,7 @@ import getTrad from '../../utils/getTrad';
 import useConfig from '../../hooks/useConfig';
 import useLocales from '../../hooks/useLocales';
 import useGetLocalizations from '../../hooks/useLocalizations';
+import useContentTypePermissions from '../../hooks/useContentTypePermissions';
 
 const EditViewRightLinks = () => {
   const toggleNotification = useNotification();
@@ -34,9 +35,18 @@ const EditViewRightLinks = () => {
     (config.contentTypes === '*' || config.contentTypes.includes(uid));
   const didChangeData = !isEqual(initialData, modifiedData);
 
-  const { localizations, isLoading: localizationsIsLoading } =
+  const { localizations: existingLocales, isLoading: localizationsIsLoading } =
     useGetLocalizations(uid, entityId);
+  const { createPermissions, updatePermissions } =
+    useContentTypePermissions(uid);
 
+  const allowedLocales = locales
+    .filter(({ code }) => code !== currentLocale)
+    .filter(({ code }) =>
+      existingLocales.includes(code)
+        ? updatePermissions.includes(code)
+        : createPermissions.includes(code),
+    );
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const toggleModal = () => setModalOpen((s) => !s);
@@ -99,9 +109,8 @@ const EditViewRightLinks = () => {
         onClose={handleCancel}
         onSubmit={handleSubmit}
         isLoading={isLoading || localesIsLoading || localizationsIsLoading}
-        allLocales={locales.map(({ code, name }) => ({ code, name }))}
-        existingLocales={localizations}
-        currentLocale={currentLocale}
+        allLocales={allowedLocales.map(({ code, name }) => ({ code, name }))}
+        existingLocales={existingLocales}
       />
     </>
   );

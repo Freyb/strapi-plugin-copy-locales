@@ -1,6 +1,6 @@
 'use strict';
 
-const { ApplicationError } = require('@strapi/utils').errors;
+const { ApplicationError, ForbiddenError } = require('@strapi/utils').errors;
 
 module.exports = ({ strapi }) => {
   const getLocaleService = () => strapi.plugin('i18n').service('locales');
@@ -8,12 +8,38 @@ module.exports = ({ strapi }) => {
     strapi.plugin('i18n').service('localizations');
   const getEntityAPI = (uid) => strapi.query(uid);
 
+  const actionToLocales = (userAbility, action, subject) => {
+    const rule = userAbility.relevantRuleFor(action, subject).conditions;
+    for (let logicalOperatorKey in rule) {
+      const logicalOperatorValue = rule[logicalOperatorKey];
+      for (let condition of logicalOperatorValue) {
+        for (let conditionKey in condition) {
+          const conditionValue = condition[conditionKey];
+          if (conditionKey === 'locale') {
+            return conditionValue['$in'];
+          }
+        }
+      }
+    }
+    return [];
+  };
+
   const generate = async ({ contentType, data, locales: selectedLocales }) => {
     const localeService = getLocaleService();
     const localizationService = getLocalizationService();
     const entityAPI = getEntityAPI(contentType.uid);
     const ctx = strapi.requestContext.get();
-    const { user } = ctx.state;
+    const { user, userAbility } = ctx.state;
+    const updateLocalePermissions = actionToLocales(
+      userAbility,
+      'plugin::content-manager.explorer.update',
+      contentType.uid,
+    );
+    const createLocalePermissions = actionToLocales(
+      userAbility,
+      'plugin::content-manager.explorer.create',
+      contentType.uid,
+    );
 
     const allLocales = (await localeService.find()).map((l) => l.code);
     const invalidLocales = selectedLocales.some((l) => !allLocales.includes(l));
@@ -36,11 +62,32 @@ module.exports = ({ strapi }) => {
     const updatedById = user.id;
     const createdIds = [id, ...localizations.map((l) => l.id)];
 
+    // Check permissions
     for (let locale of selectedLocales) {
       if (locale === originalLocale) continue;
 
       if (existingLocales.includes(locale)) {
-        //Update
+        // Update
+        if (!updateLocalePermissions.includes(locale)) {
+          throw new ForbiddenError(
+            'You do not have permission to update ' + locale,
+          );
+        }
+      } else {
+        // Create
+        if (!createLocalePermissions.includes(locale)) {
+          throw new ForbiddenError(
+            'You do not have permission to create ' + locale,
+          );
+        }
+      }
+    }
+
+    for (let locale of selectedLocales) {
+      if (locale === originalLocale) continue;
+
+      if (existingLocales.includes(locale)) {
+        // Update
         const updatedEntryID = localizations.find(
           (l) => l.locale === locale,
         ).id;
@@ -55,7 +102,7 @@ module.exports = ({ strapi }) => {
           populate: true,
         });
       } else {
-        //Create
+        // Create
         const newData = {
           ...rest,
           createdBy: createdById,
