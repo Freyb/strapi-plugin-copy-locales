@@ -12,23 +12,30 @@ import CopyModal from '../CopyModal';
 import { pluginId } from '../../pluginId';
 import getTrad from '../../utils/getTrad';
 import useConfig from '../../hooks/useConfig';
+import useLocales from '../../hooks/useLocales';
+import useGetLocalizations from '../../hooks/useLocalizations';
 
 const EditViewRightLinks = () => {
   const toggleNotification = useNotification();
   const cmdatamanager = useCMEditViewDataManager();
   const { refetchPermissions } = useRBACProvider();
   const { config, isLoading: configIsLoading } = useConfig();
+  const { locales, isLoading: localesIsLoading } = useLocales();
 
   const { allLayoutData, isCreatingEntry, initialData, modifiedData } =
     cmdatamanager;
   const { contentType } = allLayoutData;
   const { uid } = contentType;
+  const { id: entityId, locale: currentLocale } = modifiedData;
 
   const isLocalized = contentType?.pluginOptions?.i18n.localized || false;
   const allowedEntity =
     !configIsLoading &&
     (config.contentTypes === '*' || config.contentTypes.includes(uid));
   const didChangeData = !isEqual(initialData, modifiedData);
+
+  const { localizations, isLoading: localizationsIsLoading } =
+    useGetLocalizations(uid, entityId);
 
   const [isModalOpen, setModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -47,11 +54,11 @@ const EditViewRightLinks = () => {
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (values) => {
     setIsLoading(true);
     request(`/${pluginId}/generate`, {
       method: 'POST',
-      body: { contentType, data: modifiedData },
+      body: { contentType, data: modifiedData, locales: values },
     })
       .then(async () => {
         toggleNotification({
@@ -91,7 +98,10 @@ const EditViewRightLinks = () => {
         isOpen={isModalOpen}
         onClose={handleCancel}
         onSubmit={handleSubmit}
-        isLoading={isLoading}
+        isLoading={isLoading || localesIsLoading || localizationsIsLoading}
+        allLocales={locales.map(({ code, name }) => ({ code, name }))}
+        existingLocales={localizations}
+        currentLocale={currentLocale}
       />
     </>
   );

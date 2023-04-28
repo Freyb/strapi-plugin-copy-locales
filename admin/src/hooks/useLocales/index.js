@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { request, useNotification } from '@strapi/helper-plugin';
 
 const fetchLocalesList = async () => {
@@ -15,11 +15,10 @@ const fetchLocalesList = async () => {
 
 const useLocales = () => {
   const toggleNotification = useNotification();
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [locales, setLocales] = useState([]);
 
   useEffect(() => {
-    setIsLoading(true);
     fetchLocalesList()
       .then((locales) => {
         setLocales(locales);

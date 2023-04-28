@@ -9,6 +9,14 @@ module.exports = [
   },
   {
     method: 'GET',
+    path: '/getlocalizations',
+    handler: 'generateController.getLocalizations',
+    config: {
+      policies: ['admin::isAuthenticatedAdmin'],
+    },
+  },
+  {
+    method: 'GET',
     path: '/config',
     handler: 'configController.getConfig',
     config: {

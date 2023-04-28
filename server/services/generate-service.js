@@ -41,7 +41,17 @@ module.exports = ({ strapi }) => {
     return { data: createdIds };
   };
 
+  const getLocalizations = async (uid, id) => {
+    const entityAPI = getEntityAPI(uid);
+    const entity = await entityAPI.findOne({
+      where: { id },
+      populate: { localizations: true },
+    });
+    return (entity.localizations ?? []).map((l) => l.locale);
+  };
+
   return {
     generate,
+    getLocalizations,
   };
 };

@@ -8,8 +8,13 @@ module.exports = ({ strapi }) => {
     const { body } = ctx.request;
     ctx.body = await generateService.generate(body);
   };
+  const getLocalizations = async (ctx) => {
+    const { query } = ctx.request;
+    ctx.body = await generateService.getLocalizations(query.uid, query.id);
+  };
 
   return {
     generate,
+    getLocalizations,
   };
 };

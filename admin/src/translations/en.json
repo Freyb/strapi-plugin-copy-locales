@@ -5,6 +5,7 @@
 
   "modal.title": "Create localizations",
   "modal.body": "Are you sure you want to copy to all other languages?",
+  "modal.placeholder": "Select locales...",
   "modal.button.cancel": "Cancel",
   "modal.button.confirm": "Confirm",
 

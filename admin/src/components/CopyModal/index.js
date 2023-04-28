@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Dialog,
@@ -10,6 +10,7 @@ import {
   Box,
   Icon,
   Loader,
+  MultiSelectNested,
 } from '@strapi/design-system';
 import { useIntl } from 'react-intl';
 import styled from 'styled-components';
@@ -35,8 +36,17 @@ const ModifiedDialogBody = ({ children, icon, isLoading }) => {
   );
 };
 
-const CopyModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
+const CopyModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  isLoading,
+  allLocales,
+  existingLocales,
+  currentLocale,
+}) => {
   const { formatMessage } = useIntl();
+  const [selected, setSelected] = useState([]);
 
   return (
     <Dialog
@@ -56,13 +66,51 @@ const CopyModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
             {isLoading ? (
               <Loader>Loading...</Loader>
             ) : (
-              <Typography id="confirm-description">
-                {formatMessage({
-                  id: getTrad('modal.body'),
-                  defaultMessage:
-                    'Are you sure you want to copy to all other languages?',
-                })}
-              </Typography>
+              <Box>
+                <Box marginBottom="1rem">
+                  <Typography id="confirm-description">
+                    {formatMessage({
+                      id: getTrad('modal.body'),
+                      defaultMessage:
+                        'Are you sure you want to copy to all other languages?',
+                    })}
+                  </Typography>
+                </Box>
+                <MultiSelectNested
+                  onClear={() => {
+                    setSelected([]);
+                  }}
+                  value={selected}
+                  onChange={setSelected}
+                  customizeContent={(values) =>
+                    values.length == 0
+                      ? formatMessage({
+                          id: getTrad('modal.placeholder'),
+                          defaultMessage: 'Select locales...',
+                        })
+                      : values.length <= 8
+                      ? values.map((v) => v.toUpperCase()).join(', ')
+                      : `${values.length} locales selected`
+                  }
+                  options={[
+                    {
+                      label: 'All',
+                      children: allLocales
+                        .filter((l) => l.code !== currentLocale)
+                        .map((l) => ({
+                          label: existingLocales.includes(l.code) ? (
+                            <Typography variant="omega" fontWeight="bold">
+                              {`* Overwrite ${l.name}`}
+                            </Typography>
+                          ) : (
+                            `+ Create ${l.name}`
+                          ),
+                          value: l.code,
+                        })),
+                    },
+                  ]}
+                />
+              </Box>
             )}
           </Flex>
         </Flex>
@@ -78,7 +126,7 @@ const CopyModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
         }
         endAction={
           <Button
-            onClick={onSubmit}
+            onClick={() => onSubmit(selected)}
             variant="success-light"
             startIcon={<Duplicate />}
             disabled={isLoading}
@@ -94,11 +142,19 @@ const CopyModal = ({ isOpen, onClose, onSubmit, isLoading }) => {
   );
 };
 
+CopyModal.defaultProps = {
+  allLocales: [],
+  existingLocales: [],
+};
+
 CopyModal.propTypes = {
   isOpen: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
+  allLocales: PropTypes.array,
+  existingLocales: PropTypes.array,
+  currentLocale: PropTypes.string,
 };
 
 export default CopyModal;
