@@ -24,6 +24,8 @@ module.exports = ({ strapi }) => {
       localizations = [],
       createdBy,
       updatedBy,
+      createdAt: _createdAt,
+      updatedAt: _updatedAt,
       ...rest
     } = data;
 
