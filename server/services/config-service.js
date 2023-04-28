@@ -2,13 +2,14 @@
 
 const { pluginId } = require('../../admin/src/pluginId');
 
-module.exports = ({ strapi }) => {
-  const defaultConfig = {
-    contentTypes: [],
-  };
+const defaultConfig = require('../config');
 
+module.exports = ({ strapi }) => {
   const getConfig = async () => {
-    const config = strapi.config.get(`plugin.${pluginId}`, defaultConfig);
+    const config = strapi.config.get(
+      `plugin.${pluginId}`,
+      defaultConfig.default,
+    );
     return config;
   };
 
