@@ -99,7 +99,13 @@ const EditViewRightLinks = () => {
     if (!isLoading) toggleModal();
   };
 
-  if (!isLocalized || !allowedEntity || isCreatingEntry) return null;
+  if (
+    !isLocalized ||
+    !allowedEntity ||
+    isCreatingEntry ||
+    allowedLocales.length == 0
+  )
+    return null;
 
   return (
     <>
