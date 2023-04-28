@@ -12,6 +12,8 @@ module.exports = ({ strapi }) => {
     const localeService = getLocaleService();
     const localizationService = getLocalizationService();
     const entityAPI = getEntityAPI(contentType.uid);
+    const ctx = strapi.requestContext.get();
+    const { user } = ctx.state;
 
     const allLocales = (await localeService.find()).map((l) => l.code);
     const invalidLocales = selectedLocales.some((l) => !allLocales.includes(l));
@@ -22,16 +24,16 @@ module.exports = ({ strapi }) => {
       id,
       locale: originalLocale,
       localizations = [],
-      createdBy,
-      updatedBy,
+      createdBy: _createdBy,
+      updatedBy: _updatedBy,
       createdAt: _createdAt,
       updatedAt: _updatedAt,
       ...rest
     } = data;
 
     const existingLocales = localizations.map((l) => l.locale);
-    const createdById = createdBy.id;
-    const updatedById = updatedBy.id;
+    const createdById = user.id;
+    const updatedById = user.id;
     const createdIds = [id, ...localizations.map((l) => l.id)];
 
     for (let locale of selectedLocales) {
@@ -44,7 +46,6 @@ module.exports = ({ strapi }) => {
         ).id;
         const newData = {
           ...rest,
-          createdBy: createdById,
           updatedBy: updatedById,
         };
 
