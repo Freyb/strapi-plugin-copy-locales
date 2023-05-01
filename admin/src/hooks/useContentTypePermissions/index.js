@@ -5,8 +5,6 @@ const useContentTypePermissions = (slug) => {
   const collectionTypesRelatedPermissions = useSelector(
     selectCollectionTypesRelatedPermissions,
   );
-  console.log(selectCollectionTypesRelatedPermissions);
-  console.log(collectionTypesRelatedPermissions);
 
   const currentCTRelatedPermissions = collectionTypesRelatedPermissions[slug];
 
