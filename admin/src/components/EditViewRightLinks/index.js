@@ -15,6 +15,7 @@ import useConfig from '../../hooks/useConfig';
 import useLocales from '../../hooks/useLocales';
 import useGetLocalizations from '../../hooks/useLocalizations';
 import useContentTypePermissions from '../../hooks/useContentTypePermissions';
+import { cleanData } from '@strapi/plugin-i18n/admin/src/components/CMEditViewInjectedComponents/CMEditViewCopyLocale/utils';
 
 const EditViewRightLinks = () => {
   const toggleNotification = useNotification();
@@ -65,10 +66,17 @@ const EditViewRightLinks = () => {
   };
 
   const handleSubmit = (values) => {
+    const cleanedData = cleanData(
+      modifiedData,
+      allLayoutData,
+      modifiedData.localizations,
+    );
+    cleanedData.id = modifiedData.id;
+
     setIsLoading(true);
     request(`/${pluginId}/generate`, {
       method: 'POST',
-      body: { contentType, data: modifiedData, locales: values },
+      body: { contentType, data: cleanedData, locales: values },
     })
       .then(async () => {
         toggleNotification({

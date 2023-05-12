@@ -1,12 +1,18 @@
 'use strict';
 
+const { setCreatorFields, pipeAsync } = require('@strapi/utils');
 const { ApplicationError, ForbiddenError } = require('@strapi/utils').errors;
+const { omit } = require('lodash/fp');
+const { getNonWritableAttributes } = require('@strapi/utils').contentTypes;
 
 module.exports = ({ strapi }) => {
   const getLocaleService = () => strapi.plugin('i18n').service('locales');
   const getLocalizationService = () =>
     strapi.plugin('i18n').service('localizations');
   const getEntityAPI = (uid) => strapi.query(uid);
+
+  const pickWritableAttributes = (model) =>
+    omit(getNonWritableAttributes(strapi.getModel(model)));
 
   const actionToLocales = (userAbility, action, subject) => {
     const rule = userAbility.relevantRuleFor(action, subject).conditions;
@@ -27,9 +33,9 @@ module.exports = ({ strapi }) => {
   const generate = async ({ contentType, data, locales: selectedLocales }) => {
     const localeService = getLocaleService();
     const localizationService = getLocalizationService();
-    const entityAPI = getEntityAPI(contentType.uid);
     const ctx = strapi.requestContext.get();
     const { user, userAbility } = ctx.state;
+
     const updateLocalePermissions = actionToLocales(
       userAbility,
       'plugin::content-manager.explorer.update',
@@ -41,25 +47,25 @@ module.exports = ({ strapi }) => {
       contentType.uid,
     );
 
+    const entityManager = strapi
+      .plugin('content-manager')
+      .service('entity-manager');
+    const permissionChecker = strapi
+      .plugin('content-manager')
+      .service('permission-checker')
+      .create({
+        userAbility,
+        model: contentType.uid,
+      });
+
     const allLocales = (await localeService.find()).map((l) => l.code);
     const invalidLocales = selectedLocales.some((l) => !allLocales.includes(l));
     if (invalidLocales.length > 0) {
       throw new ApplicationError('Invalid locales! ' + invalidLocales);
     }
-    const {
-      id,
-      locale: originalLocale,
-      localizations = [],
-      createdBy: _createdBy,
-      updatedBy: _updatedBy,
-      createdAt: _createdAt,
-      updatedAt: _updatedAt,
-      ...rest
-    } = data;
+    const { id, locale: originalLocale, localizations = [], ...rest } = data;
 
     const existingLocales = localizations.map((l) => l.locale);
-    const createdById = user.id;
-    const updatedById = user.id;
     const createdIds = [id, ...localizations.map((l) => l.id)];
 
     // Check permissions
@@ -88,37 +94,62 @@ module.exports = ({ strapi }) => {
 
       if (existingLocales.includes(locale)) {
         // Update
-        const updatedEntryID = localizations.find(
+        const entityTobeUpdated = localizations.find(
           (l) => l.locale === locale,
-        ).id;
+        );
         const newData = {
           ...rest,
-          updatedBy: updatedById,
         };
 
-        await entityAPI.update({
-          where: { id: updatedEntryID },
-          data: newData,
-          populate: true,
+        const pickWritables = pickWritableAttributes({
+          model: contentType.uid,
         });
+        const pickPermittedFields =
+          permissionChecker.sanitizeUpdateInput(entityTobeUpdated);
+        const setCreator = setCreatorFields({ user, isEdition: true });
+        const sanitizeFn = pipeAsync(
+          pickWritables,
+          pickPermittedFields,
+          setCreator,
+        );
+
+        const sanitizedBody = await sanitizeFn(newData);
+        const updatedEntity = await entityManager.update(
+          entityTobeUpdated,
+          sanitizedBody,
+          contentType.uid,
+        );
+        await permissionChecker.sanitizeOutput(updatedEntity);
       } else {
         // Create
         const newData = {
           ...rest,
-          createdBy: createdById,
-          updatedBy: updatedById,
           locale,
           localizations: createdIds,
         };
 
-        const result = await entityAPI.create({
-          data: newData,
-          populate: true,
+        const pickWritables = pickWritableAttributes({
+          model: contentType.uid,
         });
-        await localizationService.syncLocalizations(result, {
+        const pickPermittedFields = permissionChecker.sanitizeCreateInput;
+        const setCreator = setCreatorFields({ user });
+        const sanitizeFn = pipeAsync(
+          pickWritables,
+          pickPermittedFields,
+          setCreator,
+        );
+
+        const sanitizedBody = await sanitizeFn(newData);
+        const entity = await entityManager.create(
+          sanitizedBody,
+          contentType.uid,
+        );
+        const final = await permissionChecker.sanitizeOutput(entity);
+
+        await localizationService.syncLocalizations(final, {
           model: contentType,
         });
-        createdIds.push(result.id);
+        createdIds.push(final.id);
       }
     }
     return { data: createdIds };
