@@ -34,6 +34,7 @@ module.exports = ({ strapi }) => {
     const localeService = getLocaleService();
     const localizationService = getLocalizationService();
     const ctx = strapi.requestContext.get();
+    if (!ctx || !ctx?.state) return;
     const { user, userAbility } = ctx.state;
 
     const updateLocalePermissions = actionToLocales(
