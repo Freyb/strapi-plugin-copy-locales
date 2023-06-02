@@ -30,7 +30,7 @@ const EditViewRightLinks = () => {
   const { uid } = contentType;
   const { id: entityId, locale: currentLocale } = modifiedData;
 
-  const isLocalized = contentType?.pluginOptions?.i18n.localized || false;
+  const isLocalized = contentType?.pluginOptions?.i18n?.localized || false;
   const allowedEntity =
     !configIsLoading &&
     (config.contentTypes === '*' || config.contentTypes.includes(uid));
