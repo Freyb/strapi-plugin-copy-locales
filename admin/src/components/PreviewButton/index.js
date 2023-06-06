@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 import PropTypes from 'prop-types';
 import { Button } from '@strapi/design-system';
 import { useIntl } from 'react-intl';
-import { Duplicate } from '@strapi/icons';
+import { Earth } from '@strapi/icons';
 import getTrad from '../../utils/getTrad';
 
 const PreviewButton = ({ onClick }) => {
@@ -12,7 +12,7 @@ const PreviewButton = ({ onClick }) => {
     <Button
       onClick={onClick}
       size="S"
-      startIcon={<Duplicate />}
+      startIcon={<Earth />}
       variant="secondary"
       style={{ width: '100%' }}
     >
