@@ -4,7 +4,7 @@
   "notification.generate.modifieddata": "First, save your data!",
 
   "modal.title": "Create localizations",
-  "modal.body": "Are you sure you want to copy to all other languages?",
+  "modal.body": "Select the locales you want to create/override",
   "modal.placeholder": "Select locales...",
   "modal.button.cancel": "Cancel",
   "modal.button.confirm": "Confirm",
