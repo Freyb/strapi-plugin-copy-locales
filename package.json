@@ -1,12 +1,12 @@
 {
-  "name": "content-auto-create",
+  "name": "strapi-plugin-copy-locales",
   "version": "0.0.0",
-  "description": "This is the description of the plugin.",
+  "description": "A Strapi plugin that helps you copy content between locales.",
   "strapi": {
-    "name": "content-auto-create",
-    "description": "Description of Content Auto Create plugin",
+    "name": "copy-locales",
+    "description": "A Strapi plugin that helps you copy content between locales.",
     "kind": "plugin",
-    "displayName": "Content Auto Create"
+    "displayName": "Strapi Plugin Copy Locales"
   },
   "dependencies": {
     "@strapi/design-system": "^1.6.3",
@@ -27,11 +27,13 @@
     "styled-components": "^5.3.6"
   },
   "author": {
-    "name": "A Strapi developer"
+    "name": "Freyb",
+    "email": "balazs.frey@gmail.com"
   },
   "maintainers": [
     {
-      "name": "A Strapi developer"
+      "name": "Freyb",
+      "email": "balazs.frey@gmail.com"
     }
   ],
   "engines": {
