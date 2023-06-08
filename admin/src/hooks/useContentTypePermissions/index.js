@@ -1,5 +1,7 @@
 import { useSelector } from 'react-redux';
-import selectCollectionTypesRelatedPermissions from '@strapi/plugin-i18n/admin/src/selectors/selectCollectionTypesRelatedPermissions';
+
+const selectCollectionTypesRelatedPermissions = (state) =>
+  state.rbacProvider.collectionTypesRelatedPermissions;
 
 const useContentTypePermissions = (slug) => {
   const collectionTypesRelatedPermissions = useSelector(
@@ -8,20 +10,22 @@ const useContentTypePermissions = (slug) => {
 
   const currentCTRelatedPermissions = collectionTypesRelatedPermissions[slug];
 
-  const getLocales = (action) => {
+  const getPermissions = (action) => {
     const permissions = currentCTRelatedPermissions[action] || [];
     if (permissions.length === 0) return [];
     return permissions[0]?.properties?.locales || [];
   };
 
-  const readPermissions = getLocales('plugin::content-manager.explorer.read');
-  const createPermissions = getLocales(
+  const readPermissions = getPermissions(
+    'plugin::content-manager.explorer.read',
+  );
+  const createPermissions = getPermissions(
     'plugin::content-manager.explorer.create',
   );
-  const updatePermissions = getLocales(
+  const updatePermissions = getPermissions(
     'plugin::content-manager.explorer.update',
   );
-  const deletePermissions = getLocales(
+  const deletePermissions = getPermissions(
     'plugin::content-manager.explorer.delete',
   );
 

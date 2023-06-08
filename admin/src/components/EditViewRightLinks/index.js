@@ -12,7 +12,7 @@ import CopyModal from '../CopyModal';
 import pluginId from '../../pluginId';
 import getTrad from '../../utils/getTrad';
 import useConfig from '../../hooks/useConfig';
-import useLocales from '../../hooks/useLocales';
+import useLocales from '@strapi/plugin-i18n/admin/src/hooks/useLocales';
 import useGetLocalizations from '../../hooks/useLocalizations';
 import useContentTypePermissions from '../../hooks/useContentTypePermissions';
 import { cleanData } from '@strapi/plugin-i18n/admin/src/components/CMEditViewInjectedComponents/CMEditViewCopyLocale/utils';

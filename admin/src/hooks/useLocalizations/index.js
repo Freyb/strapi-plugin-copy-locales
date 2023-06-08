@@ -3,18 +3,14 @@ import { request, useNotification } from '@strapi/helper-plugin';
 import pluginId from '../../pluginId';
 
 const getLocalizations = async (uid, id) => {
-  try {
-    const data = await request(
-      `/${pluginId}/getlocalizations?uid=${uid}&id=${id}`,
-      {
-        method: 'GET',
-      },
-    );
+  const data = await request(
+    `/${pluginId}/getlocalizations?uid=${uid}&id=${id}`,
+    {
+      method: 'GET',
+    },
+  );
 
-    return data;
-  } catch (e) {
-    throw e;
-  }
+  return data;
 };
 
 const useGetLocalizations = (uid, id) => {
