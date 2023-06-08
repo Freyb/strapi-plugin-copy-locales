@@ -1,6 +1,6 @@
 'use strict';
 
-const { pluginId } = require('../../admin/src/pluginId');
+const pluginId = require('../../admin/src/pluginId');
 
 const defaultConfig = require('../config');
 

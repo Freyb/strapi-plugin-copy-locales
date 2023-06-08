@@ -1,40 +1,39 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { request, useNotification } from '@strapi/helper-plugin';
-import { pluginId } from '../../pluginId';
-import defaultState from './defaultState';
+import { useSelector, useDispatch } from 'react-redux';
+import pluginId from '../../pluginId';
+import { reducerPrefix, RESOLVE_CONFIG } from '../reducers';
 
-const fetchConfig = async () => {
+const fetchConfig = async (toggleNotification) => {
   try {
     const data = await request(`/${pluginId}/config`, {
       method: 'GET',
     });
 
-    return data ?? {};
+    return data;
   } catch (e) {
-    throw e;
+    toggleNotification({
+      type: 'warning',
+      message: { id: 'notification.error' },
+    });
+
+    return e;
   }
 };
 
 const useConfig = () => {
+  const dispatch = useDispatch();
   const toggleNotification = useNotification();
-  const [isLoading, setIsLoading] = useState(true);
-  const [config, setConfig] = useState(defaultState);
+  const isLoading = useSelector((state) => state[reducerPrefix].isLoading);
+  const config = useSelector((state) => state[reducerPrefix].config);
 
   useEffect(() => {
-    fetchConfig()
-      .then((config) => {
-        setConfig(config);
-      })
-      .catch(() => {
-        toggleNotification({
-          type: 'warning',
-          message: { id: 'notification.error' },
-        });
-      })
-      .finally(() => {
-        setIsLoading(false);
+    if (isLoading) {
+      fetchConfig(toggleNotification).then((config) => {
+        dispatch({ type: RESOLVE_CONFIG, config });
       });
-  }, [toggleNotification]);
+    }
+  }, [dispatch, toggleNotification]);
 
   return { config, isLoading };
 };

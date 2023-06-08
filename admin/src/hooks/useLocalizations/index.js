@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { request, useNotification } from '@strapi/helper-plugin';
-import { pluginId } from '../../pluginId';
+import pluginId from '../../pluginId';
 
 const getLocalizations = async (uid, id) => {
   try {

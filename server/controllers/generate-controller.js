@@ -1,5 +1,5 @@
 'use strict';
-const pluginId = require('../../admin/src/pluginId').pluginId;
+const pluginId = require('../../admin/src/pluginId');
 
 module.exports = ({ strapi }) => {
   const generateService = strapi.plugin(pluginId).service('generateService');

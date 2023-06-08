@@ -9,7 +9,7 @@ import isEqual from 'lodash/isEqual';
 
 import PreviewButton from '../PreviewButton';
 import CopyModal from '../CopyModal';
-import { pluginId } from '../../pluginId';
+import pluginId from '../../pluginId';
 import getTrad from '../../utils/getTrad';
 import useConfig from '../../hooks/useConfig';
 import useLocales from '../../hooks/useLocales';

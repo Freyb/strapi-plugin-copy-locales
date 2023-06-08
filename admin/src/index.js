@@ -1,6 +1,7 @@
 import { prefixPluginTranslations } from '@strapi/helper-plugin';
 import pluginPkg from '../../package.json';
 import pluginId from './pluginId';
+import configReducer from './hooks/reducers';
 import Initializer from './components/Initializer';
 import EditViewRightLinks from './components/EditViewRightLinks';
 
@@ -8,6 +9,8 @@ const name = pluginPkg.strapi.name;
 
 export default {
   register(app) {
+    app.addReducers(configReducer);
+
     app.registerPlugin({
       id: pluginId,
       initializer: Initializer,
