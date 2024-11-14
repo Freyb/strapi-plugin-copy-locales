@@ -1,3 +1,6 @@
+# UNMAINTAINED
+Unfortunately, I'm no longer working on Strapi projects. Feel free to fork the project, or send PRs.
+
 # Strapi Plugin Copy Locales
 
 A Strapi plugin that helps you copy content between locales in case you want to preserve content structure.\
